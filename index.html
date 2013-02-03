@@ -1,0 +1,225 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>$PS1 Generator</title>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" media="screen" type="text/css" href="colorpicker/css/colorpicker.css" />
+  <style>
+    #sortable li,
+    #draggables li {
+      display: inline-block;
+      padding: 5px;
+      border: solid 1px #ccc;
+      border-radius: 5px;
+      margin: 0  5px 0 10px;
+      text-align: center;
+      position: relative;
+    }
+
+    li .hold {
+      position: absolute;
+      bottom: 0;
+      cursor: move;
+    }
+
+    #sortable li.ui-sortable-placeholder {
+      background-color: #eee;
+      border: dashed 1px #ccc;
+      visibility: visible !important;
+      height: 58px;
+    }
+
+    .draggable {
+
+    }
+
+    .popover-title {
+      display: none;
+    }
+
+    .color-picker {
+      width: 20px;
+      height: 20px;
+      background-color: #0000ff;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    #sortable {
+      background-color: #f9f9f9;
+      min-width:100px;
+      min-height: 100px;
+    }
+
+    .example {
+      display: block;
+      border-bottom: dashed 1px #ccc;
+      margin-bottom: 3px;
+    }
+
+    /* North/South cursors make more sense */
+    .colorpicker_field span {
+      cursor: ns-resize;
+    }
+
+    .colorpicker_hue {
+      cursor: ns-resize;
+    }
+
+    /* Reset Bootstrap input settings for color picker */
+    .colorpicker input {
+      width: auto;
+      height: auto;
+      line-height: normal;
+    }
+  </style>
+</head>
+<body>
+
+  <ul id="draggables">
+  </ul>
+
+  <ul id="sortable">
+  </ul>
+
+  <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="underscore-min.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+  <script type="text/javascript" src="colorpicker/js/colorpicker.js"></script>
+  <script>
+
+    var symbolsTable = [
+      ['\\d', 'Date in "Wed Sep 06" format', 'Sat Feb 02'],
+      ['\\h', 'First part of hostname (such as "mybox")', 'mybox'],
+      ['\\H', 'Full hostname (such as "mybox.mydomain.com")', 'mybox.mydomain.com'],
+      ['\\t', 'Time in 24-hour format (such as "23:01:01")', '23:01:01'],
+      ['\\T', 'Time in 12-hour format (such as "11:01:01")', '11:01:01'],
+      ['\\@', 'Time in 12-hour format with am/pm', '11:01:01 AM'],
+      ['\\u', 'Your username', 'omar'],
+      ['\\w', 'Current working directory (such as "/home/drobbins")', '~'],
+      ['\\W', 'The "basename" of the current working directory (such as "drobbins")', '~'],
+      ['\\#', 'Command number (this will count up at each prompt, as long as you type something)', '9001']
+    ];
+
+    var symbols = (function() {
+      var items = [];
+
+      for(var i in symbolsTable) {
+        var symbol = symbolsTable[i];
+        var text = symbol[0];
+        var description = symbol[1].replace(/"/g, "'");
+        var example = symbol[2];
+
+        var item = {
+          text: text,
+          description: description,
+          example: example
+        };
+
+        items.push(item);
+      }
+
+      return items;
+    })();
+
+    var colorsTable = [
+      ['Black', '30m', '#000'],
+      ['Red', '31m', '#ba2f1e'],
+      ['Green', '32m', '#22b421'],
+      ['Yellow', '33m', '#a4a423'],
+      ['Blue' , '34m', '#3f2add'],
+      ['Pink' , '35m', '#cd31cd'],
+      ['Cyan', '36m', '#2db2c1'],
+      ['Gray', '37m', '#2db2c1']
+    ];
+
+    var colors = (function() {
+      var items = [];
+
+      for(var i in colorsTable) {
+        var color = colorsTable[i];
+        var text = color[0];
+        var code = color[1];
+        var hex = color[2];
+
+        var item = {
+          text: text,
+          code: code,
+          hex: hex
+        };
+
+        items.push(item);
+      }
+
+      return items;
+    })();
+
+
+    var colorPickerOptions = {
+        color: '#0000ff',
+        onShow: function (colpkr) {
+          $(colpkr).fadeIn(500);
+          return false;
+        },
+        onHide: function (colpkr) {
+          $(colpkr).fadeOut(500);
+          return false;
+        },
+        onChange: function (hsb, hex, rgb, el) {
+          var hextext = '#' + hex;
+          $(el).css('background-color', hextext);
+          $(el).siblings('.example').css('color', hextext);
+          //$(el).siblings('.example').css('color', '#' + hex);
+          //$('div', el).css('backgroundColor', '#' + hex);
+        }
+      };
+
+    _.templateSettings = {
+      interpolate : /\{\{(.+?)\}\}/g
+    };
+
+    var template = _.template('\
+      <li class="draggable new-item">\
+        <span class="example">{{ example }}</span>\
+        <i class="icon-move hold"></i>\
+        <a href="#" class="btn btn-mini pop-it" data-content="{{ description }}">{{ text }}</a>\
+        <div class="color-picker"></div>\
+      </li>\
+    ');
+
+    $(document).ready(function() {
+      var html = '';
+      for(var i in symbols) {
+        html += template(symbols[i]);
+      }
+
+      $('#draggables').html(html);
+
+      $( "#sortable" ).sortable({
+        revert: true
+      });
+      $( "#draggables li" ).draggable({
+        connectToSortable: "#sortable",
+        helper: "clone",
+        revert: "invalid",
+        cursorAt: { left: 0 }
+      });
+      $( "ul, li" ).disableSelection();
+
+      var popoverOptions = {
+        placement: 'bottom'
+      };
+
+      $('.pop-it').popover(popoverOptions);
+
+
+      
+
+      $('.color-picker').ColorPicker(colorPickerOptions);
+    });
+  </script>
+</body>
+</html>
