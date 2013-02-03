@@ -5,23 +5,32 @@
   <meta charset="utf-8" />
   <title>$PS1 Generator</title>
   <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-  <link rel="stylesheet" media="screen" type="text/css" href="colorpicker/css/colorpicker.css" />
+
   <style>
-    #sortable li,
-    #draggables li {
+    li.draggable {
       display: inline-block;
       padding: 5px;
       border: solid 1px #ccc;
       border-radius: 5px;
-      margin: 0  5px 0 10px;
+      margin: 0  5px 10px 10px;
       text-align: center;
       position: relative;
     }
 
     li .hold {
-      position: absolute;
-      bottom: 0;
       cursor: move;
+      position: absolute;
+      left: -6px;
+      bottom: -6px;
+    }
+
+    .dropdown-menu {
+      text-align: left;
+      min-width: auto;
+    }
+
+    .dropdown-menu li > a {
+      padding: 3px 10px;
     }
 
     #sortable li.ui-sortable-placeholder {
@@ -29,6 +38,10 @@
       border: dashed 1px #ccc;
       visibility: visible !important;
       height: 58px;
+    }
+    
+    a.dropdown-toggle {
+      margin-top: 1px;
     }
 
     .draggable {
@@ -39,12 +52,12 @@
       display: none;
     }
 
-    .color-picker {
-      width: 20px;
-      height: 20px;
-      background-color: #0000ff;
+    .color-picker-add {
       display: inline-block;
-      vertical-align: middle;
+    }
+
+    .color-picker {
+      width: auto;
     }
 
     #sortable {
@@ -59,36 +72,86 @@
       margin-bottom: 3px;
     }
 
-    /* North/South cursors make more sense */
-    .colorpicker_field span {
-      cursor: ns-resize;
+    .example input {
+      margin: 0 0 2px 0;
+      padding: 2px 4px;
     }
 
-    .colorpicker_hue {
-      cursor: ns-resize;
+    .color-preview {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
     }
 
-    /* Reset Bootstrap input settings for color picker */
-    .colorpicker input {
-      width: auto;
-      height: auto;
-      line-height: normal;
+    .popover {
+      width: 200px;
+      font-size: 12px;
     }
+
   </style>
 </head>
 <body>
+  <div class="container">
+    <h3>A PS1 generator and reference</h3>
+    <fieldset>
+      <legend>Options <small>- drag items from here to the 'Selected' area</small></legend>
+      <ul id="draggables">
+          <li class="draggable new-item">
+            <span class="example">
+              <input type="text" class="input-mini" />
+            </span>
+            <i class="icon-move hold"></i>
+            <a href="#" class="btn btn-mini pop-it" data-content="Enter custom text">txt</a>
+            <div class="color-picker-add"></div>
+          </li>
 
-  <ul id="draggables">
-  </ul>
+      </ul>
+    </fieldset>
 
-  <ul id="sortable">
-  </ul>
+    <fieldset id="selected">
+      <legend>Selected <small>- items placed here will be used to generate the PS1 string</small></legend>
+      <ul id="sortable">
+      </ul>
+    </fieldset>
+
+    <fieldset>
+      <legend>Output <small>- the PS1 string that matches the items selected</small></legend>
+      <p id="output"></p>
+    </fieldset>
+  </div>
 
   <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <script src="underscore-min.js"></script>
   <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
-  <script type="text/javascript" src="colorpicker/js/colorpicker.js"></script>
+  
+  <script type="text/template" id="item-template">
+      <li class="draggable new-item">
+        <span class="example">{{ example }}</span>
+        <i class="icon-move hold"></i>
+        <a href="#" class="btn btn-mini pop-it" data-content="{{ description }}">{{ text }}</a>
+        <div class="color-picker-add"></div>
+      </li>
+  </script>
+
+  <script type="text/template" id="color-template">
+  <div class="btn-group">
+    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+      <span class="color-preview" style="background-color: #000" data-code="30m"></span>
+    </a>
+    <ul class="dropdown-menu">
+      {[ _.each(colors, function (color) { ]}
+        <li>
+          <a href="#" class="color-pick">
+            <span class="color-preview" style="background-color:{{ color.hex }}" data-code="{{ color.code }}"></span>
+            {{ color.text }}
+          </a>
+        </li>
+      {[ }); ]}
+    </ul>
+  </div>
+  </script>
+
   <script>
 
     var symbolsTable = [
@@ -133,7 +196,7 @@
       ['Blue' , '34m', '#3f2add'],
       ['Pink' , '35m', '#cd31cd'],
       ['Cyan', '36m', '#2db2c1'],
-      ['Gray', '37m', '#2db2c1']
+      ['Gray', '37m', '#c4c5c6']
     ];
 
     var colors = (function() {
@@ -157,46 +220,13 @@
       return items;
     })();
 
-
-    var colorPickerOptions = {
-        color: '#0000ff',
-        onShow: function (colpkr) {
-          $(colpkr).fadeIn(500);
-          return false;
-        },
-        onHide: function (colpkr) {
-          $(colpkr).fadeOut(500);
-          return false;
-        },
-        onChange: function (hsb, hex, rgb, el) {
-          var hextext = '#' + hex;
-          $(el).css('background-color', hextext);
-          $(el).siblings('.example').css('color', hextext);
-          //$(el).siblings('.example').css('color', '#' + hex);
-          //$('div', el).css('backgroundColor', '#' + hex);
-        }
-      };
-
     _.templateSettings = {
+      evaluate : /\{\[([\s\S]+?)\]\}/g,
       interpolate : /\{\{(.+?)\}\}/g
     };
 
-    var template = _.template('\
-      <li class="draggable new-item">\
-        <span class="example">{{ example }}</span>\
-        <i class="icon-move hold"></i>\
-        <a href="#" class="btn btn-mini pop-it" data-content="{{ description }}">{{ text }}</a>\
-        <div class="color-picker"></div>\
-      </li>\
-    ');
-
     $(document).ready(function() {
-      var html = '';
-      for(var i in symbols) {
-        html += template(symbols[i]);
-      }
-
-      $('#draggables').html(html);
+      populateItems();
 
       $( "#sortable" ).sortable({
         revert: true
@@ -205,7 +235,13 @@
         connectToSortable: "#sortable",
         helper: "clone",
         revert: "invalid",
-        cursorAt: { left: 0 }
+        cursorAt: { left: 0 },
+        stop: function() {
+          clicking();
+          textChange();
+          updateOutput();
+          $('.pop-it').popover(popoverOptions);
+        }
       });
       $( "ul, li" ).disableSelection();
 
@@ -215,11 +251,82 @@
 
       $('.pop-it').popover(popoverOptions);
 
-
-      
-
-      $('.color-picker').ColorPicker(colorPickerOptions);
+      $('.color-picker-add').replaceWith(colorsDropdown);
+      clicking();
     });
+
+    var populateItems = function() {
+      var template = _.template($('#item-template').html());
+
+      var html = '';
+      for(var i in symbols) {
+        html += template(symbols[i]);
+      }
+
+      $('#draggables').prepend(html);
+    };
+
+    var colorsDropdown = (function() {
+      var template = _.template($('#color-template').html());
+      var html = template({ colors: colors });
+      return html;
+    })();
+
+    function clicking() {
+      $('a.color-pick').on('click', function () {
+        var $this = $(this);
+        var color = $this.find('.color-preview').css('background-color');
+        var code = $this.find('.color-preview').attr('data-code');
+
+        $this.parents('.new-item').find('.example, .example input').css('color', color);
+        $this.parents('.btn-group').find('.dropdown-toggle .color-preview').css('background-color', color);
+        $this.parents('.btn-group').find('.dropdown-toggle .color-preview').attr('data-code', code);
+
+        updateOutput();
+      });
+    }
+
+    function textChange() {
+      $('#selected .example input').on('keyup', function() {
+        updateOutput();
+      });
+    }
+
+    function getSelectedItems() {
+      var items = [];
+
+      var text = '';
+      var $selected = $('#sortable li.new-item:not(.ui-sortable-placeholder)');
+      if($selected.size() == 0)
+        return '';
+
+      $('#sortable li.new-item:not(.ui-sortable-placeholder)').each(function (index) {
+        var $this = $(this);
+        var code = $this.find('.dropdown-toggle .color-preview').attr('data-code');
+        //var color = $this.find('.color-preview').attr('background-color');
+        var symbol = $this.find('.pop-it').text();
+        if(symbol === 'txt') {
+          symbol = $this.find('input').val();
+        }
+        text += '\\e[0;' + code + symbol + " ";
+
+        var item = {
+          code: code,
+          symbol: symbol
+        };
+        items.push(item);
+      });
+
+      text += '\\e[0m ';
+
+      return text;
+    }
+
+    function updateOutput() {
+      var output = getSelectedItems();
+      $('#output').html(output);
+    }
+
   </script>
 </body>
 </html>
