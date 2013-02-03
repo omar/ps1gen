@@ -24,6 +24,17 @@
       bottom: -6px;
     }
 
+    li .delete {
+      position: absolute;
+      cursor: pointer;
+      top: -6px;
+      right: -6px;
+    }
+
+    #draggables .delete {
+      display: none;
+    }
+
     .dropdown-menu {
       text-align: left;
       min-width: auto;
@@ -96,6 +107,7 @@
       <legend>Options <small>- drag items from here to the 'Selected' area</small></legend>
       <ul id="draggables">
           <li class="draggable new-item">
+            <i class="icon-remove delete"></i>
             <span class="example">
               <input type="text" class="input-mini" />
             </span>
@@ -114,13 +126,13 @@
     </fieldset>
 
     <fieldset>
-      <legend>Output <small>- the PS1 string that matches the items selected</small></legend>
-      <p id="output"></p>
+      <legend>Preview <small>- what your command prompt will look like</small></legend>
+      <p id="preview"></p>
     </fieldset>
 
     <fieldset>
-      <legend>Preview <small>- what your command prompt will look like</small></legend>
-      <p id="preview"></p>
+      <legend>Output <small>- the PS1 string that matches the items selected</small></legend>
+      <p id="output"></p>
     </fieldset>
   </div>
 
@@ -131,6 +143,7 @@
   
   <script type="text/template" id="item-template">
       <li class="draggable new-item">
+        <i class="icon-remove delete"></i>
         <span class="example">{{ example }}</span>
         <i class="icon-move hold"></i>
         <a href="#" class="btn btn-mini pop-it" data-content="{{ description }}">{{ text }}</a>
@@ -292,7 +305,15 @@
       });
 
       $('a.pop-it').on('click', function(e) {
-        e.preventDefault(); return true;
+        e.preventDefault(); 
+        return true;
+      });
+
+      $('.delete').click(function(e) {
+        $(this).parent('li').remove();
+        updateOutput();
+        e.preventDefault(); 
+        return true;
       });
     };
 
@@ -324,6 +345,7 @@
 
         if(symbol === 'txt') {
           symbol = $this.find('input').val();
+          symbol = symbol.replace(/"/g, '\\"');
           $clone.html($clone.find('input').val());
         }
           
