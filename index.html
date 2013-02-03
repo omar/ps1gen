@@ -87,7 +87,6 @@
       width: 200px;
       font-size: 12px;
     }
-
   </style>
 </head>
 <body>
@@ -242,8 +241,8 @@
         revert: "invalid",
         cursorAt: { left: 0 },
         stop: function() {
-          clicking();
-          textChange();
+          bindClicks();
+          bindTextChange();
           updateOutput();
           $('.pop-it').popover(popoverOptions);
         }
@@ -257,7 +256,7 @@
       $('.pop-it').popover(popoverOptions);
 
       $('.color-picker-add').replaceWith(colorsDropdown);
-      clicking();
+      bindClicks();
     });
 
     var populateItems = function() {
@@ -277,7 +276,7 @@
       return html;
     })();
 
-    function clicking() {
+    var bindClicks = function() {
       $('a.color-pick').on('click', function (e) {
         var $this = $(this);
         var color = $this.find('.color-preview').css('background-color');
@@ -295,15 +294,15 @@
       $('a.pop-it').on('click', function(e) {
         e.preventDefault(); return true;
       });
-    }
+    };
 
-    function textChange() {
+    var bindTextChange = function() {
       $('#selected .example input').on('keyup', function() {
         updateOutput();
       });
-    }
+    };
 
-    function parseSelectedItems() {
+    var parseSelectedItems = function() {
       var items = [];
 
       var text = '';
@@ -325,8 +324,6 @@
 
         if(symbol === 'txt') {
           symbol = $this.find('input').val();
-          $clone = $this.find('.example').clone().attr('class', '');
-          
           $clone.html($clone.find('input').val());
         }
           
@@ -349,14 +346,13 @@
       };
 
       return result;
-    }
+    };
 
-    function updateOutput() {
+    var updateOutput = function() {
       var result = parseSelectedItems();
       $('#preview').html(result.preview);
       $('#output').html(result.text);
-    }
-
+    };
   </script>
 </body>
 </html>
