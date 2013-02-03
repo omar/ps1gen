@@ -118,6 +118,11 @@
       <legend>Output <small>- the PS1 string that matches the items selected</small></legend>
       <p id="output"></p>
     </fieldset>
+
+    <fieldset>
+      <legend>Preview <small>- what your command prompt will look like</small></legend>
+      <p id="preview"></p>
+    </fieldset>
   </div>
 
   <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
@@ -273,7 +278,7 @@
     })();
 
     function clicking() {
-      $('a.color-pick').on('click', function () {
+      $('a.color-pick').on('click', function (e) {
         var $this = $(this);
         var color = $this.find('.color-preview').css('background-color');
         var code = $this.find('.color-preview').attr('data-code');
@@ -283,6 +288,12 @@
         $this.parents('.btn-group').find('.dropdown-toggle .color-preview').attr('data-code', code);
 
         updateOutput();
+        e.preventDefault(); 
+        return true;
+      });
+
+      $('a.pop-it').on('click', function(e) {
+        e.preventDefault(); return true;
       });
     }
 
@@ -292,24 +303,36 @@
       });
     }
 
-    function getSelectedItems() {
+    function parseSelectedItems() {
       var items = [];
 
       var text = '';
+      var preview = '';
       var $selected = $('#sortable li.new-item:not(.ui-sortable-placeholder)');
       if($selected.size() == 0)
-        return '';
+        return {
+          text: '',
+          preview: '',
+          items: []
+        };
 
-      $('#sortable li.new-item:not(.ui-sortable-placeholder)').each(function (index) {
+      $selected.each(function (index) {
         var $this = $(this);
         var code = $this.find('.dropdown-toggle .color-preview').attr('data-code');
-        //var color = $this.find('.color-preview').attr('background-color');
+        
         var symbol = $this.find('.pop-it').text();
+        var $clone = $this.find('.example').clone().attr('class', '');
+
         if(symbol === 'txt') {
           symbol = $this.find('input').val();
+          $clone = $this.find('.example').clone().attr('class', '');
+          
+          $clone.html($clone.find('input').val());
         }
+          
+        preview += $clone[0].outerHTML + " ";  
         text += '\\e[0;' + code + symbol + " ";
-
+        
         var item = {
           code: code,
           symbol: symbol
@@ -319,12 +342,19 @@
 
       text += '\\e[0m ';
 
-      return text;
+      var result = {
+        text: text,
+        preview: preview,
+        items: items
+      };
+
+      return result;
     }
 
     function updateOutput() {
-      var output = getSelectedItems();
-      $('#output').html(output);
+      var result = parseSelectedItems();
+      $('#preview').html(result.preview);
+      $('#output').html(result.text);
     }
 
   </script>
