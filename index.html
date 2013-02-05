@@ -127,11 +127,15 @@
       }
 
       #preview-background {
-         margin: 0 0 5px 5px;
+         margin: 0 0 5px 5px;         
       }
 
       .preview-example {
          color: #c4c5c6;
+      }
+
+      fieldset {
+        margin: 0 0 10px 0;
       }
    </style>
 </head>
@@ -163,9 +167,10 @@
     <fieldset>
       <legend>Preview <small>- what your command prompt will look like</small></legend>
       <div id="preview-background">
+        <span>Background</span>
          <div class="btn-group">
-            <a href="#" class="btn active" data-color="#333">Dark</a>
-            <a href="#" class="btn" data-color="#fff">Light</a>
+            <a href="#" class="btn btn-small active" data-color="#333">Dark</a>
+            <a href="#" class="btn btn-small" data-color="#fff">Light</a>
          </div>
       </div>
       <p id="preview"></p>
@@ -174,6 +179,15 @@
     <fieldset>
       <legend>Output <small>- the PS1 string that matches the items selected</small></legend>
       <p id="output"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend>References</legend>
+
+      <ul>
+        <li><a href="http://www.gnu.org/software/bash/manual/bashref.html#Printing-a-Prompt">bash manual: Controlling the Prompt</a> (gnu.org)</li>
+        <li><a href="http://www.ibm.com/developerworks/library/l-tip-prompt/">Tip: Prompt magic</a> (ibm.com)</li>
+      </ul>
     </fieldset>
   </div>
 
@@ -213,16 +227,16 @@
   <script>
 
     var symbolsTable = [
-      ['\\d', 'Date in "Wed Sep 06" format', 'Sat Feb 02'],
-      ['\\h', 'First part of hostname (such as "mybox")', 'mybox'],
-      ['\\H', 'Full hostname (such as "mybox.mydomain.com")', 'mybox.mydomain.com'],
-      ['\\t', 'Time in 24-hour format (such as "23:01:01")', '23:01:01'],
-      ['\\T', 'Time in 12-hour format (such as "11:01:01")', '11:01:01'],
+      ['\\d', 'Date in "Weekday Month Date" format', 'Tue May 26'],
+      ['\\h', 'Hostname, up to the first \'.\'', 'mybox'],
+      ['\\H', 'Hostname', 'mybox.mydomain.com'],
+      ['\\t', 'Time in 24-hour HH:MM:SS format', '23:01:01'],
+      ['\\T', 'Time in 12-hour HH:MM:SS format', '11:01:01'],
       ['\\@', 'Time in 12-hour format with am/pm', '11:01:01 AM'],
-      ['\\u', 'Your username', 'omar'],
-      ['\\w', 'Current working directory (such as "/home/drobbins")', '~'],
-      ['\\W', 'The "basename" of the current working directory (such as "drobbins")', '~'],
-      ['\\#', 'Command number (this will count up at each prompt, as long as you type something)', '9001']
+      ['\\u', 'Username of current user', 'omar'],
+      ['\\w', 'Current working directory, with $HOME abbreviated with a tilde (uses the $PROMPT_DIRTRIM variable)', '~'],
+      ['\\W', 'Basename of the current working directory ', '~'],
+      ['\\#', 'Command number (this will count up at each prompt, as long as you type something)', '5']
     ];
 
     var symbols = (function() {
@@ -247,14 +261,14 @@
     })();
 
     var colorsTable = [
+      ['Gray', '37m', '#c4c5c6'],
       ['Black', '30m', '#000'],
       ['Red', '31m', '#ba2f1e'],
       ['Green', '32m', '#22b421'],
       ['Yellow', '33m', '#a4a423'],
       ['Blue' , '34m', '#3f2add'],
       ['Pink' , '35m', '#cd31cd'],
-      ['Cyan', '36m', '#2db2c1'],
-      ['Gray', '37m', '#c4c5c6']
+      ['Cyan', '36m', '#2db2c1']
     ];
 
     var colors = (function() {
@@ -342,6 +356,8 @@
         $this.parents('.new-item').find('.example, .example input').css('color', color);
         $this.parents('.btn-group').find('.dropdown-toggle .color-preview').css('background-color', color);
         $this.parents('.btn-group').find('.dropdown-toggle .color-preview').attr('data-code', code);
+        $this.parents('ul').find('li').removeClass('active');
+        $this.parent('li').addClass('active');
 
         updateOutput();
         e.preventDefault(); 
@@ -398,7 +414,8 @@
 
         if(symbol === 'txt') {
           symbol = $this.find('input').val();
-          symbol = symbol.replace(/"/g, '\\"');
+          symbol = symbol.replace(/"/g, '\\"')
+                         .replace(/\\/g, '\\\\');
           $clone.html($clone.find('input').val());
         }
           
