@@ -17,7 +17,7 @@
          padding: 5px;
          border: solid 1px #ccc;
          border-radius: 5px;
-         margin: 0  5px 10px 10px;
+         margin: 0  10px 10px 10px;
          text-align: center;
          position: relative;
          background-color: #f9f9f9;
@@ -51,10 +51,12 @@
       }
 
       #sortable li.ui-sortable-placeholder {
-         background-color: #eee;
-         border: dashed 1px #ccc;
+         background-color: #d9edf7;
+         border: dashed 1px #3a87ad;
          visibility: visible !important;
-         height: 58px;
+         
+         margin: 0 10px;
+         padding: 0;
       }
 
       a.dropdown-toggle {
@@ -90,6 +92,7 @@
       }
 
       .example {
+         color: #c4c5c6;
          display: block;
          border-bottom: dashed 1px #ccc;
          margin-bottom: 3px;
@@ -113,10 +116,22 @@
 
       #preview,
       #output {
-         background-color: #f9f9f9;
+         background-color: #333;
          padding: 5px;
          margin: 0 5px;
          min-height: 20px;
+      }
+
+      #output {
+         color: #f9f9f9;
+      }
+
+      #preview-background {
+         margin: 0 0 5px 5px;
+      }
+
+      .preview-example {
+         color: #c4c5c6;
       }
    </style>
 </head>
@@ -147,6 +162,12 @@
 
     <fieldset>
       <legend>Preview <small>- what your command prompt will look like</small></legend>
+      <div id="preview-background">
+         <div class="btn-group">
+            <a href="#" class="btn active" data-color="#333">Dark</a>
+            <a href="#" class="btn" data-color="#fff">Light</a>
+         </div>
+      </div>
       <p id="preview"></p>
     </fieldset>
 
@@ -174,7 +195,7 @@
   <script type="text/template" id="color-template">
   <div class="btn-group">
     <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-      <span class="color-preview" style="background-color: #000" data-code="30m"></span>
+      <span class="color-preview" style="background-color: #c4c5c6" data-code="37m"></span>
     </a>
     <ul class="dropdown-menu">
       {[ _.each(colors, function (color) { ]}
@@ -266,7 +287,10 @@
       populateItems();
 
       $( "#sortable" ).sortable({
-        revert: true
+        revert: true,
+        stop: function () {
+         updateOutput();
+        }
       });
       $( "#draggables li" ).draggable({
         connectToSortable: "#sortable",
@@ -335,6 +359,15 @@
         e.preventDefault(); 
         return true;
       });
+
+      $('#preview-background a').click(function(e) {
+         $('#preview-background a').removeClass('active');
+         var $this = $(this);
+         $this.toggleClass('active');
+         $('#preview').css('background-color', $this.data('color'));
+         e.preventDefault(); 
+         return true;
+      });
     };
 
     var bindTextChange = function() {
@@ -361,7 +394,7 @@
         var code = $this.find('.dropdown-toggle .color-preview').attr('data-code');
         
         var symbol = $this.find('.pop-it').text();
-        var $clone = $this.find('.example').clone().attr('class', '');
+        var $clone = $this.find('.example').clone().attr('class', 'preview-example');
 
         if(symbol === 'txt') {
           symbol = $this.find('input').val();
