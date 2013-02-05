@@ -2,103 +2,123 @@
 
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>$PS1 Generator</title>
-  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+   <meta charset="utf-8" />
+   <title>$PS1 Generator</title>
+   <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
 
-  <style>
-    li.draggable {
-      display: inline-block;
-      padding: 5px;
-      border: solid 1px #ccc;
-      border-radius: 5px;
-      margin: 0  5px 10px 10px;
-      text-align: center;
-      position: relative;
-    }
+   <style>
 
-    li .hold {
-      cursor: move;
-      position: absolute;
-      left: -6px;
-      bottom: -6px;
-    }
+      body {
+         background-image: url(shattered.png);
+      }
 
-    li .delete {
-      position: absolute;
-      cursor: pointer;
-      top: -6px;
-      right: -6px;
-    }
+      li.draggable {
+         display: inline-block;
+         padding: 5px;
+         border: solid 1px #ccc;
+         border-radius: 5px;
+         margin: 0  5px 10px 10px;
+         text-align: center;
+         position: relative;
+         background-color: #f9f9f9;
+      }
 
-    #draggables .delete {
-      display: none;
-    }
+      li .hold {
+         cursor: move;
+         position: absolute;
+         left: -6px;
+         bottom: -6px;
+      }
 
-    .dropdown-menu {
-      text-align: left;
-      min-width: auto;
-    }
+      li .delete {
+         position: absolute;
+         cursor: pointer;
+         top: -6px;
+         right: -6px;
+      }
 
-    .dropdown-menu li > a {
-      padding: 3px 10px;
-    }
+      #draggables .delete {
+         display: none;
+      }
 
-    #sortable li.ui-sortable-placeholder {
-      background-color: #eee;
-      border: dashed 1px #ccc;
-      visibility: visible !important;
-      height: 58px;
-    }
-    
-    a.dropdown-toggle {
-      margin-top: 1px;
-    }
+      .dropdown-menu {
+         text-align: left;
+         min-width: auto;
+      }
 
-    .draggable {
+      .dropdown-menu li > a {
+         padding: 3px 10px;
+      }
 
-    }
+      #sortable li.ui-sortable-placeholder {
+         background-color: #eee;
+         border: dashed 1px #ccc;
+         visibility: visible !important;
+         height: 58px;
+      }
 
-    .popover-title {
-      display: none;
-    }
+      a.dropdown-toggle {
+         margin-top: 1px;
+      }
 
-    .color-picker-add {
-      display: inline-block;
-    }
+      .draggable {
 
-    .color-picker {
-      width: auto;
-    }
+      }
 
-    #sortable {
-      background-color: #f9f9f9;
-      min-width:100px;
-      min-height: 100px;
-    }
+      .popover-title {
+         display: none;
+      }
 
-    .example {
-      display: block;
-      border-bottom: dashed 1px #ccc;
-      margin-bottom: 3px;
-    }
+      .color-picker-add {
+         display: inline-block;
+      }
 
-    .example input {
-      margin: 0 0 2px 0;
-      padding: 2px 4px;
-    }
+      .color-picker {
+         width: auto;
+      }
 
-    .color-preview {
-      width: 10px;
-      height: 10px;
-      display: inline-block;
-    }
+      #sortable {
+         min-width:100px;
+         min-height: 100px;
+         border: dashed 2px #333;
+      }
 
-    .popover {
-      width: 200px;
-      font-size: 12px;
-    }
-  </style>
+      #draggables, 
+      #sortable {
+         margin: 10px;
+         padding: 5px;
+      }
+
+      .example {
+         display: block;
+         border-bottom: dashed 1px #ccc;
+         margin-bottom: 3px;
+      }
+
+      .example input {
+         margin: 0 0 2px 0;
+         padding: 2px 4px;
+      }
+
+      .color-preview {
+         width: 10px;
+         height: 10px;
+         display: inline-block;
+      }
+
+      .popover {
+         width: 200px;
+         font-size: 12px;
+      }
+
+      #preview,
+      #output {
+         background-color: #f9f9f9;
+         padding: 5px;
+         margin: 0 5px;
+         min-height: 20px;
+      }
+   </style>
 </head>
 <body>
   <div class="container">
@@ -136,10 +156,10 @@
     </fieldset>
   </div>
 
-  <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <script src="underscore-min.js"></script>
-  <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
   
   <script type="text/template" id="item-template">
       <li class="draggable new-item">
