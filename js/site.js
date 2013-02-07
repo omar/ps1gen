@@ -133,7 +133,7 @@
   };
 
   var bindClicks = function() {
-    $('a.color-pick').on('click', function (e) {
+    $('a.color-pick').off('click').on('click', function (e) {
       var $this = $(this);
       var color = $this.find('.color-preview').css('background-color');
       var code = $this.find('.color-preview').attr('data-color-code');
@@ -149,19 +149,19 @@
       return true;
     });
 
-    $('a.pop-it').on('click', function(e) {
+    $('a.pop-it').off('click').on('click', function (e) {
       e.preventDefault(); 
       return true;
     });
 
-    $('.delete').click(function(e) {
+    $('.delete').off('click').on('click', function (e) {
       $(this).parent('li').remove();
       updateOutput();
       e.preventDefault(); 
       return true;
     });
 
-    $('#preview-background a').click(function(e) {
+    $('#preview-background a').off('click').on('click', function (e) {
        $('#preview-background a').removeClass('active');
        var $this = $(this);
        $this.toggleClass('active');
@@ -170,8 +170,11 @@
        return true;
     });
 
-    $('.trailing-whitespace').click(function (e) {
+    $('.trailing-whitespace').off('click').on('click', function (e) {
+      $(this).toggleClass('active');
       updateOutput();
+      e.preventDefault(); 
+      return true;
     });
   };
 
@@ -199,7 +202,7 @@
 
       var colorCode = $this.find('.dropdown-toggle .color-preview').attr('data-color-code');
       var symbol = $this.find('.pop-it').text();
-      var whitespace = $this.find('.trailing-whitespace').is(':checked');
+      var whitespace = $this.find('.trailing-whitespace').is('.active');
       
       var $clone = $this.find('.example').clone().attr('class', 'preview-example');
 
