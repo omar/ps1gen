@@ -14,6 +14,7 @@
       revert: "invalid",
       cursorAt: { left: 0 },
       stop: function() {
+        $('.pop-it').popover('destroy');
         bindClicks();
         bindTextChange();
         updateOutput();
@@ -26,10 +27,11 @@
       placement: 'bottom'
     };
 
+    bindClicks();
+
     $('.pop-it').popover(popoverOptions);
 
     $('.color-picker-add').replaceWith(colorsDropdown);
-    bindClicks();
   });
 
   _.templateSettings = {
@@ -149,7 +151,7 @@
       return true;
     });
 
-    $('a.pop-it').off('click').on('click', function (e) {
+    $('.pop-it').off('click').on('click', function (e) {
       e.preventDefault(); 
       return true;
     });
