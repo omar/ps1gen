@@ -310,7 +310,7 @@
                   <i class="icon-move hold"></i>
                   <a href="#" class="btn btn-mini pop-it" data-content='Enter custom text. Automatically escapes \ and "'>txt</a>
                   <div class="color-picker-add"></div>
-                  <input type="checkbox" checked="checked" />
+                  <input type="checkbox" checked="checked" class="trailing-whitespace" />
                 </li>
               </ul>
             </div>
@@ -422,13 +422,13 @@
   <script type="text/template" id="color-template">
   <div class="btn-group">
     <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-      <span class="color-preview" style="background-color: #c4c5c6" data-code="37m"></span>
+      <span class="color-preview" style="background-color: #c4c5c6" data-color-code="37m"></span>
     </a>
     <ul class="dropdown-menu">
       {[ _.each(colors, function (color) { ]}
         <li>
           <a href="#" class="color-pick">
-            <span class="color-preview" style="background-color:{{ color.hex }}" data-code="{{ color.code }}"></span>
+            <span class="color-preview" style="background-color:{{ color.hex }}" data-color-code="{{ color.code }}"></span>
             {{ color.text }}
           </a>
         </li>
@@ -577,11 +577,11 @@
       $('a.color-pick').on('click', function (e) {
         var $this = $(this);
         var color = $this.find('.color-preview').css('background-color');
-        var code = $this.find('.color-preview').attr('data-code');
+        var code = $this.find('.color-preview').attr('data-color-code');
 
         $this.parents('.new-item').find('.example, .example input').css('color', color);
         $this.parents('.btn-group').find('.dropdown-toggle .color-preview').css('background-color', color);
-        $this.parents('.btn-group').find('.dropdown-toggle .color-preview').attr('data-code', code);
+        $this.parents('.btn-group').find('.dropdown-toggle .color-preview').attr('data-color-code', code);
         $this.parents('ul').find('li').removeClass('active');
         $this.parent('li').addClass('active');
 
@@ -637,9 +637,11 @@
 
       $selected.each(function (index) {
         var $this = $(this);
-        var code = $this.find('.dropdown-toggle .color-preview').attr('data-code');
-        
+
+        var colorCode = $this.find('.dropdown-toggle .color-preview').attr('data-color-code');
         var symbol = $this.find('.pop-it').text();
+        var whitespace = $this.find('.trailing-whitespace').is(':checked');
+        
         var $clone = $this.find('.example').clone().attr('class', 'preview-example');
 
         if(symbol === 'txt') {
@@ -649,19 +651,17 @@
           $clone.html($clone.find('input').val());
         }
           
-        text += '\\e[0;' + code + symbol;
+        text += '\\e[0;' + colorCode + symbol;
 
-        var whitespace = $this.find('.trailing-whitespace').is(':checked');
-        
         if(whitespace) {
           text += ' ';  
-          $clone.html($clone.html() + '&nbsp;');
+          $clone.append('&nbsp;');
         } 
 
         preview += $clone[0].outerHTML;    
         
         var item = {
-          code: code,
+          colorCode: colorCode,
           symbol: symbol
         };
         items.push(item);
