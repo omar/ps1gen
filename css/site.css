@@ -216,8 +216,12 @@ footer {
   font-size: 12px;
 }
 
+#preview.Light #cursor {
+  color: #333;
+}
+
 #cursor {
-  color: white;
+  color: #fff;
   float: left;
 }
 

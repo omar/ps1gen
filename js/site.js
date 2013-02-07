@@ -166,6 +166,7 @@
     $('#preview-background a').off('click').on('click', function (e) {
        $('#preview-background a').removeClass('active');
        var $this = $(this);
+       $('#preview').removeClass('Dark Light').addClass($this.text());
        $this.toggleClass('active');
        $('#preview').css('background-color', $this.data('color'));
        e.preventDefault(); 
