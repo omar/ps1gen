@@ -65,8 +65,6 @@ li .delete {
    background-color: #d9edf7;
    border: dashed 1px #3a87ad;
    visibility: visible !important;
-   
-   margin: 0 10px;
    padding: 0;
 }
 
@@ -98,8 +96,8 @@ a.dropdown-toggle {
 
 #sortable li.draggable {
   clear: none;
-  float: none;
-  display: inline-block;
+  float: left;
+  display: block;
 }
 
 #draggables, 
