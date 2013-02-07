@@ -125,7 +125,7 @@
          display: block;
          border-bottom: dashed 1px #ccc;
          margin-bottom: 3px;
-         font-family: monaco, monospace;
+         font-family: Monaco,Menlo,Consolas,"Courier New",monospace;
       }
 
       .example input {
@@ -133,7 +133,7 @@
          margin: 0 0 2px 0;
          padding: 2px 4px;
          font-size: 12px;
-         font-family: monaco, monospace;
+         font-family: Monaco,Menlo,Consolas,"Courier New",monospace;
       }
 
       .color-preview {
@@ -152,7 +152,7 @@
          background-color: #333;
          padding: 5px;
          min-height: 20px;
-         font-family: monaco, monospace;
+         font-family: Monaco,Menlo,Consolas,"Courier New",monospace;
          font-size: 12px;
       }
 
@@ -167,6 +167,7 @@
 
       .preview-example {
          color: #c4c5c6;
+         float: left;
       }
 
       fieldset {
@@ -210,6 +211,26 @@
         margin-top: 5px;
         text-align: center;
       }
+
+      #legend {
+        list-style: none;
+        margin-left: 0;
+      }
+
+      #legend .example {
+        display: inline-block;
+        padding: 0 2px;
+        background-color: #f9f9f9;
+      }
+
+      #legend li {
+        font-size: 12px;
+      }
+
+      #cursor {
+        color: white;
+        float: left;
+      }
    </style>
 </head>
 <body>
@@ -227,6 +248,28 @@
     <div class="section row">
       <div class="span2">
         <h3>Options</h3>
+
+        <h6>Legend</h6>
+        <ul id="legend">
+          <li>
+            <span class="example">Text</span>: example output
+          </li>
+          <li>
+            <a href="#" class="btn btn-mini pop-it" data-content="Symbol descrption">\w</a> : symbol (click)
+          </li>
+          <li>
+            <div class="color-picker-add"></div> : text color (click)
+          </li>
+          <li>
+            <input type="checkbox" checked="checked" /> : trailing whitespace
+          </li>
+          <li>
+            <i class="icon-remove"></i>: delete
+          </li>
+          <li>
+            <i class="icon-move"></i>: move
+          </li>
+        <ul>
       </div>
       <div class="span10">
         <div class="content">
@@ -267,6 +310,7 @@
                   <i class="icon-move hold"></i>
                   <a href="#" class="btn btn-mini pop-it" data-content='Enter custom text. Automatically escapes \ and "'>txt</a>
                   <div class="color-picker-add"></div>
+                  <input type="checkbox" checked="checked" />
                 </li>
               </ul>
             </div>
@@ -304,7 +348,9 @@
       <div class="span10">
         <div class="content">
           <small>What your command prompt will look like (trailing spaces added automatically)</small>
-          <div id="preview"></div>
+          <div id="preview">
+            <span id="preview-text"></span><span id="cursor">_</span>
+          </div>
         </div>
       </div>
     </div>
@@ -315,7 +361,7 @@
       </div>
       <div class="span10">
         <div class="content">
-          <small>The PS1 string that matches the items selected</small>
+          <small>The PS1 string that matches the items selected - place this in <code>~/.bashrc</code></small>
           <div id="output"></div>
         </div>
       </div>
@@ -369,6 +415,7 @@
         <i class="icon-move hold"></i>
         <a href="#" class="btn btn-mini pop-it" data-content="{{ description }}">{{ text }}</a>
         <div class="color-picker-add"></div>
+        <input type="checkbox" checked="checked" class="trailing-whitespace" />
       </li>
   </script>
 
@@ -469,6 +516,7 @@
     };
 
     $(document).ready(function() {
+      setCursorBlink();
       populateItems();
 
       $( "#sortable" ).sortable({
@@ -562,6 +610,10 @@
          e.preventDefault(); 
          return true;
       });
+
+      $('.trailing-whitespace').click(function (e) {
+        updateOutput();
+      });
     };
 
     var bindTextChange = function() {
@@ -597,8 +649,16 @@
           $clone.html($clone.find('input').val());
         }
           
-        preview += $clone[0].outerHTML + " ";  
-        text += '\\e[0;' + code + symbol + " ";
+        text += '\\e[0;' + code + symbol;
+
+        var whitespace = $this.find('.trailing-whitespace').is(':checked');
+        
+        if(whitespace) {
+          text += ' ';  
+          $clone.html($clone.html() + '&nbsp;');
+        } 
+
+        preview += $clone[0].outerHTML;    
         
         var item = {
           code: code,
@@ -607,7 +667,7 @@
         items.push(item);
       });
 
-      text += '\\e[0m ';
+      text += '\\e[0m';
 
       var result = {
         text: text,
@@ -624,7 +684,17 @@
       var text = 'export PS1="' + result.text + '"';
       $('#output').html(text);
 
-      $('#preview').html(result.preview);
+      $('#preview-text').html(result.preview);
+    };
+
+    var setCursorBlink = function() {
+      var func = function () {
+        $('#cursor').toggle();
+      };
+
+      var interval = 500;
+
+      setInterval(func, interval);
     };
   </script>
 </body>
