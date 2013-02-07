@@ -1,9 +1,10 @@
+<!-- Yes this is using Twitter Bootstrap -->
 <!doctype html>
 
 <html lang="en">
 <head>
    <meta charset="utf-8" />
-   <title>$PS1 Generator</title>
+   <title>PS1 Bash Prompt Generator and Reference</title>
    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
 
    <style>
@@ -17,14 +18,31 @@
       }
 
       li.draggable {
-         display: inline-block;
-         padding: 5px;
-         border: solid 1px #ccc;
-         border-radius: 5px;
-         margin: 0  10px 10px 10px;
-         text-align: center;
-         position: relative;
-         background-color: #f9f9f9;
+        padding: 5px;
+        border: solid 1px #ccc;
+        border-radius: 5px;
+        margin: 0 10px 10px 0;
+        text-align: center;
+        position: relative;
+        background-color: #f9f9f9;
+        list-style: none;
+        float: left;
+        clear: both;
+      }
+
+      .category {
+        padding: 0;
+        margin: 0 25px 10px 0;
+        display: inline-block;
+        text-align: left;
+      }
+
+      .category h5 {
+        margin: 0 0 10px 0;
+      }
+
+      .options {
+        margin: 0;
       }
 
       li .hold {
@@ -41,7 +59,7 @@
          right: -6px;
       }
 
-      #draggables .delete {
+      .category .delete {
          display: none;
       }
 
@@ -83,28 +101,39 @@
          width: auto;
       }
 
-      #sortable {
+      #selected {
          min-width:100px;
          min-height: 100px;
          border: dashed 2px #333;
       }
 
+      #sortable li.draggable {
+        clear: none;
+        float: none;
+        display: inline-block;
+      }
+
       #draggables, 
       #sortable {
          margin: 10px;
-         padding: 5px;
+         min-height: 100px;
       }
 
       .example {
+         font-size: 12px;
          color: #c4c5c6;
          display: block;
          border-bottom: dashed 1px #ccc;
          margin-bottom: 3px;
+         font-family: monaco, monospace;
       }
 
       .example input {
+         color: #c4c5c6;
          margin: 0 0 2px 0;
          padding: 2px 4px;
+         font-size: 12px;
+         font-family: monaco, monospace;
       }
 
       .color-preview {
@@ -122,16 +151,18 @@
       #output {
          background-color: #333;
          padding: 5px;
-         margin: 0 5px;
          min-height: 20px;
+         font-family: monaco, monospace;
+         font-size: 12px;
       }
 
       #output {
          color: #f9f9f9;
       }
 
+
       #preview-background {
-         margin: 0 0 5px 5px;         
+         margin-bottom: 5px;
       }
 
       .preview-example {
@@ -142,76 +173,187 @@
         margin: 0 0 10px 0;
       }
 
+      fieldset legend {
+        margin-bottom: 10px; 
+      }
+
       footer {
         padding: 10px 0 20px 0;
       }
 
-      .github-btns {
-        vertical-align: middle;
+      h3 {
+        margin: 0;
+        line-height: 30px;
+      }
+
+      footer {
+        border-top: solid 1px #333;
+      }
+
+      .section {
+        margin-bottom: 10px;
+      }
+
+      .content {
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+      }
+
+      .content small {
+        font-size: 14px;
+        margin-bottom: 4px;
+        display: block;
+      }
+
+      #categories {
+        margin-top: 5px;
+        text-align: center;
       }
    </style>
 </head>
 <body>
   <div class="container">
-    <h2 id="title">ps1gen <small>a PS1 generator and reference</small></h2>
-    <iframe src="http://ghbtns.com/github-btn.html?user=omar&repo=ps1gen&type=watch&count=true"
-  allowtransparency="true" frameborder="0" scrolling="0" width="100" height="20"></iframe>
+    <h1 id="title">ps1gen <small>a PS1 generator and reference</small></h1>
+    <div class="pull-right">
+      <iframe src="http://ghbtns.com/github-btn.html?user=omar&repo=ps1gen&type=watch&count=true"
+    allowtransparency="true" frameborder="0" scrolling="0" width="100" height="20"></iframe>
 
       <iframe src="http://ghbtns.com/github-btn.html?user=omar&type=follow"
-  allowtransparency="true" frameborder="0" scrolling="0" width="200" height="20"></iframe>
-
-    <fieldset>
-      <legend>Options <small>- drag items from here to the 'Selected' area</small></legend>
-      <ul id="draggables">
-          <li class="draggable new-item">
-            <i class="icon-remove delete"></i>
-            <span class="example">
-              <input type="text" class="input-mini" />
-            </span>
-            <i class="icon-move hold"></i>
-            <a href="#" class="btn btn-mini pop-it" data-content="Enter custom text">txt</a>
-            <div class="color-picker-add"></div>
-          </li>
-
-      </ul>
-    </fieldset>
-
-    <fieldset id="selected">
-      <legend>Selected <small>- items placed here will be used to generate the PS1 string</small></legend>
-      <ul id="sortable">
-      </ul>
-    </fieldset>
-
-    <fieldset>
-      <legend>Preview <small>- what your command prompt will look like</small></legend>
-      <div id="preview-background">
-        <span>Background</span>
-         <div class="btn-group">
-            <a href="#" class="btn btn-small active" data-color="#333">Dark</a>
-            <a href="#" class="btn btn-small" data-color="#fff">Light</a>
-         </div>
-      </div>
-      <p id="preview"></p>
-    </fieldset>
-
-    <fieldset>
-      <legend>Output <small>- the PS1 string that matches the items selected</small></legend>
-      <p id="output"></p>
-    </fieldset>
-
-    <fieldset>
-      <legend>References</legend>
-
-      <ul>
-        <li><a href="http://www.gnu.org/software/bash/manual/bashref.html#Printing-a-Prompt">bash manual: Controlling the Prompt</a> (gnu.org)</li>
-        <li><a href="http://www.ibm.com/developerworks/library/l-tip-prompt/">Tip: Prompt magic</a> (ibm.com)</li>
-      </ul>
-    </fieldset>
-
+    allowtransparency="true" frameborder="0" scrolling="0" width="104" height="20"></iframe>
+    </div>
+    
     <hr />
+    <div class="section row">
+      <div class="span2">
+        <h3>Options</h3>
+      </div>
+      <div class="span10">
+        <div class="content">
+          <small>Drag items from here to the 'Selected' area</small>
+          <div id="categories">
+            <div class="category">
+              <h5>Directory</h5>
+              <ul id="directory" class="options">
+              </ul>
+            </div>
+
+            <div class="category">
+              <h5>Date</h5>
+              <ul id="date" class="options">
+              </ul>
+            </div>
+
+            <div class="category">
+              <h5>Time</h5>
+              <ul id="time" class="options">
+              </ul>
+            </div>
+
+            <div class="category">
+              <h5>Computer</h5>
+              <ul id="computer" class="options">
+              </ul>
+            </div>
+
+            <div class="category">
+              <h5>Other</h5>
+              <ul id="other" class="options">
+                <li class="draggable new-item">
+                  <i class="icon-remove delete"></i>
+                  <span class="example">
+                    <input type="text" class="input-mini" />
+                  </span>
+                  <i class="icon-move hold"></i>
+                  <a href="#" class="btn btn-mini pop-it" data-content='Enter custom text. Automatically escapes \ and "'>txt</a>
+                  <div class="color-picker-add"></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section row">
+      <div class="span2">
+        <h3>Selected</h3>
+      </div>
+      <div class="span10">
+        <div class="content">
+          <small>Items placed here will be used to generate the PS1 string</small>
+          <div id="selected">
+            <ul id="sortable">
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section row">
+      <div class="span2">
+        <h3>Preview</h3>
+        <div id="preview-background">
+          <span>Background</span>
+          <div class="btn-group">
+             <a href="#" class="btn btn-mini btn-inverse active" data-color="#333">Dark</a>
+             <a href="#" class="btn btn-mini" data-color="#f9f9f9">Light</a>
+          </div>
+        </div>
+      </div>
+      <div class="span10">
+        <div class="content">
+          <small>What your command prompt will look like (trailing spaces added automatically)</small>
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section row">
+      <div class="span2">
+        <h3>Output</h3>
+      </div>
+      <div class="span10">
+        <div class="content">
+          <small>The PS1 string that matches the items selected</small>
+          <div id="output"></div>
+        </div>
+      </div>
+    </div>
+
+<hr />
+
+    <div class="section row">
+      <div class="span2">
+        <h3>References</h3>
+      </div>
+      <div class="span10">
+        <div class="content">
+          <ul>
+            <li><a href="http://www.gnu.org/software/bash/manual/bashref.html#Printing-a-Prompt">bash manual: Controlling the Prompt</a> (gnu.org)</li>
+            <li><a href="http://www.ibm.com/developerworks/library/l-tip-prompt/">Tip: Prompt magic</a> (ibm.com)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section row">
+      <div class="span2">
+        <h3>Inspiration</h3>
+      </div>
+      <div class="span10">
+        <div class="content">
+          <ul>
+            <li><a href="http://www.kirsle.net/wizards/ps1.html#help">Noah's Bash $PS1 Generator</a> (kirsle.net)</li>
+            <li><a href="http://ps1gen.coding-journal.com/">PS1 Bash Prompt Generator</a> (ps1gen.coding-journal.com)</li>
+            <li><a href="http://xta.github.com/HalloweenBash/">Halloween Bash Profile Generator (http://xta.github.com/HalloweenBash)</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
     <footer>
-      by Omar Khudeira | <a href="http://omar.io">omar.io</a> | <a href="http://github.com/omar">github.com/omar</a>
+      ps1gen by <a href="http://omar.io">Omar Khudeira</a>
     </footer>
   </div>
 
@@ -251,16 +393,19 @@
   <script>
 
     var symbolsTable = [
-      ['\\d', 'Date in "Weekday Month Date" format', 'Tue May 26'],
-      ['\\h', 'Hostname, up to the first \'.\'', 'mybox'],
-      ['\\H', 'Hostname', 'mybox.mydomain.com'],
-      ['\\t', 'Time in 24-hour HH:MM:SS format', '23:01:01'],
-      ['\\T', 'Time in 12-hour HH:MM:SS format', '11:01:01'],
-      ['\\@', 'Time in 12-hour format with am/pm', '11:01:01 AM'],
-      ['\\u', 'Username of current user', 'omar'],
-      ['\\w', 'Current working directory, with $HOME abbreviated with a tilde (uses the $PROMPT_DIRTRIM variable)', '~'],
-      ['\\W', 'Basename of the current working directory ', '~'],
-      ['\\#', 'Command number (this will count up at each prompt, as long as you type something)', '5']
+      ['\\u', 'Username of current user', 'omar', 'computer'],
+      ['\\h', 'Hostname, up to the first \'.\'', 'mybox', 'computer'],
+      ['\\H', 'Hostname', 'mybox.local', 'computer'],
+
+      ['\\d', 'Date in "Weekday Month Date" format', 'Tue May 26', 'date'],
+      ['\\t', 'Time in 24-hour HH:MM:SS format', '23:01:01', 'time'],
+      ['\\T', 'Time in 12-hour HH:MM:SS format', '11:01:01', 'time'],
+      ['\\@', 'Time in 12-hour format with am/pm', '11:01:01 AM', 'time'],
+
+      ['\\w', 'Current working directory, with $HOME abbreviated with a tilde (uses the $PROMPT_DIRTRIM variable)', '~/ps1gen', 'directory'],
+      ['\\W', 'Basename of the current working directory ', 'ps1gen', 'directory'],
+
+      ['\\#', 'Command number (this will count up at each prompt, as long as you type something)', '5', 'other']
     ];
 
     var symbols = (function() {
@@ -271,11 +416,13 @@
         var text = symbol[0];
         var description = symbol[1].replace(/"/g, "'");
         var example = symbol[2];
+        var category = symbol[3];
 
         var item = {
           text: text,
           description: description,
-          example: example
+          example: example,
+          category: category
         };
 
         items.push(item);
@@ -330,7 +477,7 @@
          updateOutput();
         }
       });
-      $( "#draggables li" ).draggable({
+      $( ".category li" ).draggable({
         connectToSortable: "#sortable",
         helper: "clone",
         revert: "invalid",
@@ -357,12 +504,19 @@
     var populateItems = function() {
       var template = _.template($('#item-template').html());
 
-      var html = '';
+      var html = [];
       for(var i in symbols) {
-        html += template(symbols[i]);
+        var symbol = symbols[i];
+        
+        if(html[symbol.category] === undefined)
+          html[symbol.category] = '';
+
+        html[symbol.category] += template(symbols[i]);
       }
 
-      $('#draggables').prepend(html);
+      for(var i in html) {
+        $('#' + i).prepend(html[i]);
+      }
     };
 
     var colorsDropdown = (function() {
@@ -466,8 +620,11 @@
 
     var updateOutput = function() {
       var result = parseSelectedItems();
+      
+      var text = 'export PS1="' + result.text + '"';
+      $('#output').html(text);
+
       $('#preview').html(result.preview);
-      $('#output').html(result.text);
     };
   </script>
 </body>
