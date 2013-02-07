@@ -224,3 +224,15 @@ footer {
 #github-buttons {
   margin-top: 20px;
 }
+
+#share-buttons {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  margin-left: 30px;
+}
+
+#share-buttons li {
+  float: left;
+  width: 100px;
+}
