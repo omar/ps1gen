@@ -27,11 +27,9 @@
       placement: 'bottom'
     };
 
-    bindClicks();
-
-    $('.pop-it').popover(popoverOptions);
-
     $('.color-picker-add').replaceWith(colorsDropdown);
+    bindClicks();
+    $('.pop-it').popover(popoverOptions);
   });
 
   _.templateSettings = {
