@@ -214,7 +214,7 @@
         $clone.html($clone.find('input').val());
       }
         
-      text += '\\e[0;' + colorCode + symbol;
+      text += '\\[\\e[0;' + colorCode + '\\]' + symbol;
 
       if(whitespace) {
         text += ' ';  
@@ -230,7 +230,7 @@
       items.push(item);
     });
 
-    text += '\\e[0m';
+    text += '\\[\\e[0m\\]';
 
     var result = {
       text: text,
